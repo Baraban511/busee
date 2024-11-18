@@ -40,17 +40,19 @@ function Disruptions() {
 }
 function NextBus() {
   const [nextBusTime, setNextBusTime] = useState("loading...");
-
+  var fetchInterval = 10000;
   const getNextBus = async () => {
     var nextBus = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:48329/schedules?duration=3600&dataFreshness=realtime");
     nextBus = await nextBus.json();
     if (nextBus.stopSchedules[0].dateTimes[0]) {
       let busTime = DateTime.fromISO(nextBus.stopSchedules[0].dateTimes[0].dateTime);
-      if (Math.round(busTime.diffNow("minutes").minutes) < 1) {
+      if (Math.round(busTime.diffNow("minutes").minutes) < 5) {
         busTime = Math.round(busTime.diffNow("seconds").seconds) + " secondes";
+        fetchInterval = 1000;
       }
       else {
         busTime = Math.round(busTime.diffNow("minutes").minutes) + " minutes";
+        fetchInterval = 10000;
       }
       setNextBusTime(busTime);
     }
@@ -60,6 +62,10 @@ function NextBus() {
   }
   useEffect(() => {
     getNextBus();
+    const interval = setInterval(() => {
+      getNextBus();
+    }, fetchInterval); // Remplacez 10000 par le nombre de millisecondes souhaité
+    return () => clearInterval(interval);
   }, []);
   return (<>
     <Text>Prochain bus dans {nextBusTime}</Text>
