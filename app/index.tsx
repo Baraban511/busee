@@ -2,6 +2,7 @@ import { Button, Text, View, useWindowDimensions } from "react-native";
 import React, { useEffect, useState } from 'react';
 import RenderHtml from '@builder.io/react-native-render-html';
 import { DateTime } from "luxon";
+import { parse } from "@babel/core";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
     </View>
   );
 }
+
 function Disruptions() {
   const { width } = useWindowDimensions();
   const [disruptionsMessage, setDisruptionsMessage] = useState("loading...");
@@ -38,37 +40,60 @@ function Disruptions() {
     source={{ html: disruptionsMessage }}
   />)
 }
+
 function NextBus() {
-  const [nextBusTime, setNextBusTime] = useState("loading...");
-  var fetchInterval = 10000;
-  const getNextBus = async () => {
-    var nextBus = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:48329/schedules?duration=3600&dataFreshness=realtime");
-    nextBus = await nextBus.json();
-    if (nextBus.stopSchedules[0].dateTimes[0]) {
-      let busTime = DateTime.fromISO(nextBus.stopSchedules[0].dateTimes[0].dateTime);
-      if (Math.round(busTime.diffNow("minutes").minutes) < 5) {
-        busTime = Math.round(busTime.diffNow("seconds").seconds) + " secondes";
-        fetchInterval = 1000;
+
+  const [nextBusInterval, setNextBusInterval] = useState("loading...");
+  const [fetchInterval, setFetchInterval] = useState(60000);
+
+  function parseTime(time: DateTime) {
+    var text = "";
+    if (time.minute > 0) {
+      text += time.minute + "min ";
+    }
+    if (time.second > 0) {
+      text += time.second + "s";
+    }
+    return text;
+  }
+
+  const updateBusTime = async () => {
+    var busTime = await getNextBusArrival();
+    if (busTime) {
+      var busInterval = DateTime.fromMillis(busTime.diffNow("milliseconds").milliseconds);
+      setNextBusInterval(parseTime(busInterval));
+      if (busInterval.minute < 2) {
+        setFetchInterval(1000); //Une seconde
       }
       else {
-        busTime = Math.round(busTime.diffNow("minutes").minutes) + " minutes";
-        fetchInterval = 10000;
+        setFetchInterval(60000); //Une minute
       }
-      setNextBusTime(busTime);
+      return;
     }
-    else {
-      setNextBusTime("erreur");
-    }
-  }
+    setNextBusInterval("pas de bus");
+  };
+
   useEffect(() => {
-    getNextBus();
+    updateBusTime();
     const interval = setInterval(() => {
-      getNextBus();
-    }, fetchInterval); // Remplacez 10000 par le nombre de millisecondes souhaité
+      updateBusTime();
+    }, fetchInterval);
     return () => clearInterval(interval);
   }, []);
+
   return (<>
-    <Text>Prochain bus dans {nextBusTime}</Text>
-    <Button title="Rafraichir" onPress={() => getNextBus()} /></>
+    <Text>Prochain bus dans {nextBusInterval}</Text>
+    <Button title="Rafraichir" onPress={() => updateBusTime()} /></>
   )
+}
+
+async function getNextBusArrival() {
+  var nextBus = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:48329/schedules?duration=3600&dataFreshness=realtime");
+  nextBus = await nextBus.json();
+  if (nextBus.stopSchedules[0].dateTimes[0]) {
+    return DateTime.fromISO(nextBus.stopSchedules[0].dateTimes[0].dateTime);
+  }
+  else {
+    return undefined;
+  }
 }
