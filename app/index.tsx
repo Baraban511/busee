@@ -75,7 +75,7 @@ function NextBus() {
       updateBusInterval();
     }, dataFetchInterval);
     return () => clearInterval(interval);
-  }, []);
+  }, );
 
   return (<>
     <Text>Prochain bus dans {parseBusCountdown(busCountdown)}</Text>
