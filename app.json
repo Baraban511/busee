@@ -47,6 +47,12 @@
         "projectId": "e056f7c5-8c30-4f27-83c9-37f2057b8c48"
       }
     },
-    "owner": "baraban511"
+    "owner": "barab",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e056f7c5-8c30-4f27-83c9-37f2057b8c48"
+    }
   }
 }
