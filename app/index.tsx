@@ -1,4 +1,4 @@
-import { Button, Text, View, useWindowDimensions } from "react-native";
+import { Button, Text, View, useWindowDimensions, Image } from "react-native";
 import React, { useEffect, useState } from 'react';
 import RenderHtml from '@builder.io/react-native-render-html';
 import { DateTime } from "luxon";
@@ -11,7 +11,7 @@ export default function App() {
         justifyContent: "center",
         alignItems: "center",
       }}
-    >
+    ><Image source={require('../assets/images/logo.png')} />
       <Disruptions />
       <NextBus />
     </View>
@@ -64,7 +64,7 @@ function NextBus() {
   useEffect(() => {
     const interval = setInterval(() => {
       setBusCountdown((prevCountdown) => prevCountdown - 1000);
-    }, 1000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -75,7 +75,7 @@ function NextBus() {
       updateBusInterval();
     }, dataFetchInterval);
     return () => clearInterval(interval);
-  }, );
+  },);
 
   return (<>
     <Text>Prochain bus dans {parseBusCountdown(busCountdown)}</Text>
