@@ -1,1 +1,1 @@
-busee incoming app
+This app get the estimated arrival time of the next bus at a given bus stop from the official API of my local transport company.
