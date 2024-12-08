@@ -42,7 +42,7 @@ function Disruptions() {
 
 function NextBus() {
   const [busCountdown, setBusCountdown] = useState(0);
-  const [dataFetchInterval, setDataFetchInterval] = useState(60000);
+  const [dataFetchInterval, setDataFetchInterval] = useState(0);
 
 
   const updateBusInterval = async () => {
@@ -64,10 +64,9 @@ function NextBus() {
   useEffect(() => {
     const interval = setInterval(() => {
       setBusCountdown((prevCountdown) => prevCountdown - 1000);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
-
 
   useEffect(() => {
     updateBusInterval();
@@ -75,7 +74,7 @@ function NextBus() {
       updateBusInterval();
     }, dataFetchInterval);
     return () => clearInterval(interval);
-  },);
+  }, [dataFetchInterval]);
 
   return (<>
     <Text>Prochain bus dans {parseBusCountdown(busCountdown)}</Text>
