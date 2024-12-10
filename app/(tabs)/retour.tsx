@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import RenderHtml from '@builder.io/react-native-render-html';
 import { DateTime } from "luxon";
 
-export default function App() {
+export default function Retour() {
   return (
     <View
       style={{
@@ -11,7 +11,8 @@ export default function App() {
         justifyContent: "center",
         alignItems: "center",
       }}
-    ><Image source={require('../assets/images/logo.png')} />
+    >
+      <Image source={require('@/assets/images/logo.png')} />
       <Disruptions />
       <NextBus />
     </View>
@@ -31,6 +32,7 @@ function Disruptions() {
       setDisruptionsMessage("Pas d'alerte trafic !");
     }
   }
+
   useEffect(() => {
     getDisruptions();
   }, []);
@@ -42,7 +44,7 @@ function Disruptions() {
 
 function NextBus() {
   const [busCountdown, setBusCountdown] = useState(0);
-  const [dataFetchInterval, setDataFetchInterval] = useState(0);
+  const [dataFetchInterval, setDataFetchInterval] = useState(1000);
 
 
   const updateBusInterval = async () => {
@@ -69,7 +71,6 @@ function NextBus() {
   }, []);
 
   useEffect(() => {
-    updateBusInterval();
     const interval = setInterval(() => {
       updateBusInterval();
     }, dataFetchInterval);
@@ -82,8 +83,8 @@ function NextBus() {
   )
 }
 
-async function getNextBusArrival() {
-  let response = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:48329/schedules?duration=3600&dataFreshness=realtime");
+async function getNextBusArrival() { 
+  let response = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:2701/schedules?duration=3600&dataFreshness=realtime&direction=OUTWARD");
   var nextBus = await response.json();
   if (nextBus.stopSchedules[0].dateTimes[0]) {
     return DateTime.fromISO(nextBus.stopSchedules[0].dateTimes[0].dateTime);

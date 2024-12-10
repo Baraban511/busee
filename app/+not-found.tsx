@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, View } from "react-native";
 import { Link } from "expo-router";
 export default function NotFoundScreen() {
@@ -9,8 +10,8 @@ export default function NotFoundScreen() {
                 alignItems: "center",
             }}
         >
-            <Text>Nothing to see here</Text>
-            <Link href="/">Go back in safe place</Link>
+            <Text>Rien à voir ici</Text>
+            <Link href={{pathname:"./"}}>Retourner à l'arrêt</Link>
         </View>
     );
 }
