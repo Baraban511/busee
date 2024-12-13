@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import RenderHtml from '@builder.io/react-native-render-html';
 import { useWindowDimensions } from 'react-native';
 
