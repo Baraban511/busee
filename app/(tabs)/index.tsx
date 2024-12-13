@@ -1,8 +1,7 @@
-import { Button, Text, View, useWindowDimensions, Image } from "react-native";
+import { Button, Text, View, Image } from "react-native";
 import React, { useEffect, useState } from 'react';
-import RenderHtml from '@builder.io/react-native-render-html';
 import { DateTime } from "luxon";
-
+import Disruptions from "@/components/Disruptions";
 export default function Aller() {
   return (
     <View
@@ -17,29 +16,6 @@ export default function Aller() {
       <NextBus />
     </View>
   );
-}
-
-function Disruptions() {
-  const { width } = useWindowDimensions();
-  const [disruptionsMessage, setDisruptionsMessage] = useState("loading...");
-  const getDisruptions = async () => {
-    let response = await fetch("https://sytral.api.instant-system.com/InstantCore/v4/networks/57/lines/line:tcl:C11/stopPoints/stop_point:tcl:SP:48329/schedules?duration=3600&dataFreshness=realtime&direction=RETURN ");
-    var disruptions = await response.json();
-    if (disruptions.disruptions[0]) {
-      setDisruptionsMessage(disruptions.disruptions[0].messages[0].translations[0].content);
-    }
-    else {
-      setDisruptionsMessage("Pas d'alerte trafic !");
-    }
-  }
-
-  useEffect(() => {
-    getDisruptions();
-  }, []);
-  return (<RenderHtml
-    contentWidth={width}
-    source={{ html: disruptionsMessage }}
-  />)
 }
 
 function NextBus() {
